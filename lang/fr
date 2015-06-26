@@ -1,0 +1,16 @@
+<?php
+/**
+ * Traduction en Français
+ *
+ * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
+ * @author     Nada Benlahbib <nada.benlahbib@gmail.com>
+ */
+
+// Phrases courantes utilisées pour le plugin PageQuery
+$lang['no_results']   = 'Aucun résultat n\a été trouvé pour la recherche: « %1s »';
+$lang['jump_section'] = 'Continuer avec la section « %1$s » plus haut ...'; // '%1$s' will be replaced by the relevant heading
+$lang['jump_to_top']  = 'Retour en haut de cette liste';
+$lang['link_to_top']  = 'Haut ↑';
+$lang['regex_error']  = 'Il y a une erreru dans l\'expression régulière .  Vérifiez-la et essayez de nouveau.';
+$lang['empty_filter'] = 'Le filtre d\expression n\'a donné aucun résultat.';
+$lang['pagequery']    = 'Page d\'aide pour le plugin PageQuery';
