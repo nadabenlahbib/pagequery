@@ -82,7 +82,7 @@ class syntax_plugin_pagequery extends DokuWiki_Syntax_Plugin {
         $opt['hidestart'] = false;      // hide start pages
         $opt['label']     = '';         // label to put at top of the list
         $opt['layout']    = 'table';    // html layout type: table (1 col = div only) or columns (html 5 only)
-        $opt['limit']     = 0;          // limit results to certain number
+        $opt['limit']     = '0';        // limit results to certain number or a range of results
         $opt['maxns']     = 0;          // max number of namespaces to display (i.e. ns depth)
         $opt['natsort']   = false;      // allow natural case sorting
         $opt['proper']    = 'none';     // display file names in Proper Case
@@ -110,6 +110,15 @@ class syntax_plugin_pagequery extends DokuWiki_Syntax_Plugin {
                     $opt[$option] = true;
                     break;
                 case 'limit':
+                    $options = explode('-', $value);
+                    if (!empty($options[0]) && !empty($options[1])) {
+                	$from = $options[0];
+                	$until = $options[1];
+                	$opt['limit'] = array('from' => $from, 'until' => $until);
+                    } else if (!empty($options[0]) && empty($options[1])){
+                	$opt['limit'] = $options[0];
+                    }                   	
+                    break;
                 case 'maxns':
                     $opt[$option] = abs($value);
                     break;
@@ -304,9 +313,11 @@ class syntax_plugin_pagequery extends DokuWiki_Syntax_Plugin {
                 $pq->msort($sort_array, $sort_opts);
 
                 // limit the result list length if required; this can only be done after sorting!
-                if ($opt['limit'] > 0) {
-                    $sort_array = array_slice($sort_array, 0, $opt['limit']);
-                }
+                if (!empty ($opt['limit']['from']) && !empty ($opt['limit']['until'])) {
+		    $sort_array = array_slice($sort_array, (int)$opt['limit']['from'] - 1, (int)$opt['limit']['until']);		
+		} else if (empty ($opt['limit']['from']) && empty ($opt['limit']['until']) && $opt['limit'] != '0') {
+		    $sort_array = array_slice($sort_array, 0 , (int)$opt['limit']);
+		}
 
                 // do a link count BEFORE grouping (don't want to count headers...)
                 $count = count($sort_array);
