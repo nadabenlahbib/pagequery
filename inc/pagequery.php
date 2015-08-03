@@ -377,8 +377,18 @@ class PageQuery {
      * @return  string
      */
     private function _shorten($text, $extent, $more = '... ') {
+        $match = array();
         $elem = $extent[0];
         $cnt = (int) substr($extent, 1);
+        $pattern = '/={2,}\n+((?!(={2,})).+)/';
+        // first, we ignore the titles
+        if (!preg_match($pattern, rawWiki($id), $match)){ 
+        	$text = rawWiki($id);
+        } else {
+        	$text = $match[1];
+        }
+        // then we ignore all the tags such as <WRAP>
+        $text = preg_replace('/(<[^>]+>.*<\/[^>]+>)/', '', $text);
         switch ($elem) {
             case 'c':
                 $result = substr($text, 0, $cnt);
