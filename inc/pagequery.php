@@ -968,7 +968,6 @@ class PageQuery {
      */
     function replace($input) {
     	$input = preg_replace($this->patterns, $this->values, $input);
-    	var_dump($input);
     	return $input;
     }
 
