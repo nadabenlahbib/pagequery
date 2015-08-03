@@ -10,6 +10,7 @@ class PageQuery {
 
     function __construct(Array $lang) {
         $this->lang = $lang;
+        $this->prepareReplacements();
     }
 
 
@@ -936,11 +937,16 @@ class PageQuery {
         foreach ($filter as $metakey => $expr) {
             // allow for exclusion matches (put ^ or ! in front of meta key)
             $exclude = false;
+            $match=array();
             if ($metakey[0] == '^' || $metakey[0] == '!') {
                 $exclude = true;
                 $metakey = substr($metakey, 1);
             }
             $that = $this;
+            // replacements
+            if (preg_match('/^\@([A-Z]+)\@$/', $expr, $match )){
+            	$expr = $this->replace($match[0]);
+            }
             $sort_array = array_filter($sort_array, function($row) use ($metakey, $expr, $exclude, $that) {
                 if ( ! isset($row[$metakey])) return false;
                 if (strpos($metakey, 'date') !== false) {
@@ -955,6 +961,16 @@ class PageQuery {
         return $sort_array;
     }
 
+    /**
+     * Apply replacement patterns and values as prepared earlier
+     * @param string $input    The text to work on
+     * @return string processed text
+     */
+    function replace($input) {
+    	$input = preg_replace($this->patterns, $this->values, $input);
+    	var_dump($input);
+    	return $input;
+    }
 
     private function _filter_by_date($filter, $date) {
         $filter = str_replace('/', '.', $filter);  // allow for Euro style date formats
@@ -1199,6 +1215,24 @@ class PageQuery {
                 }
             }
         }
+    }
+    
+    /**
+     * Same replacements as applied at template namespaces
+     */
+    function prepareReplacements() {
+    	/* @var Input $INPUT */
+    	global $INPUT;
+    	global $USERINFO;
+    	global $conf;
+    	$this->patterns['__user__'] = '/@USER@/';
+    	$this->patterns['__name__'] = '/@NAME@/';
+    	$this->patterns['__mail__'] = '/@MAIL@/';
+    	$this->patterns['__date__'] = '/@DATE@/';
+    	$this->values['__user__'] = $INPUT->server->str('REMOTE_USER');
+    	$this->values['__name__'] = $USERINFO['name'];
+    	$this->values['__mail__'] = $USERINFO['mail'];
+    	$this->values['__date__'] = strftime('%d.%m.%Y');
     }
 
 } 
